@@ -1,0 +1,90 @@
+import win32com.client 
+ExcelApp = win32com.client.GetActiveObject("Excel.Application")
+ExcelWrkbook = ExcelApp.Workbooks(1)
+ExcelWrkSht = ExcelWrkbook.Worksheets(1)
+
+def same_difference(input_diff, num_of_p_pairs):
+
+    def change_to_be_hex(str):
+        return int(str, base=16)
+    def hexop(num1, num2):
+        res1 = change_to_be_hex(num1) ^ change_to_be_hex(num2)
+        res1 = hex(res1)
+        res = str(res1).replace("0x", "").upper()
+        if len(res) < 2:
+            res = "000" + res
+        elif len(res) < 3:
+            res = "00" + res
+        elif len(res) < 4:
+            res = "0" + res
+        return res
+    def number_to_hex(number):
+        number = number
+        if int(number) > 65536:
+            return "Can't convert it to 4 character hexadecimal number"
+        elif int(number) < 65537 and int(number) > -1:
+            number = hex(number)
+            number = number[2:]
+            hex_representation = number.zfill(4)
+            return hex_representation.upper()
+
+    number_list = list(range(int(num_of_p_pairs)))
+
+    new_hexa_list = []
+    i = 0
+    while i < len(number_list):
+        new_hexa_list.append(number_to_hex(number_list[i]))
+        i = i + 1
+
+    new_new_hexa_list = []
+    j = 0
+    while j < len(new_hexa_list):
+        new_new_hexa_list.append(hexop(new_hexa_list[j], input_diff))
+        j = j + 1
+
+    def two_numbers_into_tuple(number1, number2):
+        brackets = [number1, number2]
+        tuple_representation = brackets
+        return tuple_representation
+
+    m = 0
+    bracket_list = []
+    while m < len(new_new_hexa_list):
+        bracket_list.append(two_numbers_into_tuple(new_hexa_list[m], new_new_hexa_list[m]))
+        m = m + 1
+
+    def get_uniques(links):
+        my_set = set([])
+        my_selection = []
+        for l in links:
+            s = "".join(sorted(l))
+            if not s in my_set:
+                my_set.add(s)
+                my_selection.append(l)
+        return my_selection
+
+    bracket_list = get_uniques(bracket_list)
+    def flatten(input):
+        new_list = []
+        for i in input:
+            for j in i:
+                new_list.append(j)
+        return new_list
+    bracket_list =flatten(bracket_list)
+
+    return bracket_list
+
+input_diff = '00B0'
+num_of_p_pairs = 400
+j=0
+while j <len(same_difference(input_diff, num_of_p_pairs)):
+    i =0
+    while i < (len(same_difference(input_diff, num_of_p_pairs))/2):
+        Cell1 = ExcelWrkSht.Cells(i+1,1)
+        Cell2 = ExcelWrkSht.Cells(i+1,2)
+        Cell1.Value = same_difference(input_diff, num_of_p_pairs)[j]
+        Cell2.Value = same_difference (input_diff, num_of_p_pairs)[j+1]
+        i= i+1
+        j = j+2
+
+print(int(len(same_difference('00B0', 400))/2))
